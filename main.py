@@ -58,12 +58,13 @@ if __name__ == '__main__':
         e = fiN - 1
 
         print('Validando de Φ(N) e "e" são primos entre si')
-        if not coprime(fiN, e):
-            print('Não são primos entre si, tentando novamente')
-            continue
-        else:
+
+        if coprime(fiN, e):
             print('São primos entre si')
             break
+        
+        print('Não são primos entre si, tentando novamente')
+            
 
     print('Calculando d')
     d = 0
