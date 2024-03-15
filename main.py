@@ -52,13 +52,13 @@ if __name__ == '__main__':
         N = p * q
 
         print('Calculando Φ(N)')
-        ΦN = (p - 1) * (q - 1)
+        fiN = (p - 1) * (q - 1)
 
         print('Calculando e')
-        e = ΦN - 1
+        e = fiN - 1
 
         print('Validando de Φ(N) e "e" são primos entre si')
-        if not coprime(ΦN, e):
+        if not coprime(fiN, e):
             print('Não são primos entre si, tentando novamente')
             continue
         else:
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     print('Calculando d')
     d = 0
-    while  (e * d) % ΦN != 1:
+    while  (e * d) % fiN != 1:
         d += 1
 
     print('Criptografando')
