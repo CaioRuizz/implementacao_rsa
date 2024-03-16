@@ -1,14 +1,35 @@
 import random
+import math
 
 frase = 'The information security is of significant importance to ensure the privacy of communications.'
 
-def is_prime(number: int) ->  bool:
-    if number <= 1:
-        return False
-    for i in range(2, int(number**0.5) + 1):
-        if number % i == 0:
-            return False
-    return True
+def is_prime(n, k=40):  # number of tests = k
+   #n = int.from_bytes(num_bytes, 'big')
+   if n <= 1:
+       return False
+   if n <= 3:
+       return True
+   if n % 2 == 0:
+       return False
+   if n % 5 == 0:
+       return False
+   
+   r, d = 0, n - 1
+   while d % 2 == 0:
+       r += 1
+       d //= 2
+   for _ in range(k):
+       a = random.randrange(2, n - 1)
+       x = pow(a, d, n)  # a^d % n
+       if x == 1 or x == n - 1:
+           continue
+       for _ in range(r - 1):
+           x = pow(x, 2, n)
+           if x == n - 1:
+               break
+       else:
+           return False
+   return True
 
 def get_two_prime_numbers() -> list[int]:
     response = []
@@ -16,7 +37,7 @@ def get_two_prime_numbers() -> list[int]:
         if len(response) == 2:
             return response
         
-        number = random.randint(2, 2 ** 8)
+        number = random.getrandbits(2048)
         if is_prime(number) and number not in response:
             response.append(number)
 
@@ -29,48 +50,50 @@ def coprime(a: int, b: int) -> bool:
     return MDC(a, b) == 1
 
 def criptografar(texto: str, e: int, N: int):
-    response = ''
-    for char in texto:
-        p = ord(char)
-        response += chr((p ** e) % N)
-    return response
+    message_bytes = texto.encode()
+    message_int = int.from_bytes(message_bytes, byteorder='big')
+    encrypted = pow(message_int, e, N)
+    return encrypted
 
-def decriptografar(texto: str, d: int, N: int):
-    response = ''
-    for char in texto:
-        p = ord(char)
-        response += chr((p ** d) % N)
-    return response
+def decriptografar(criptografado: int, d: int, N: int):
+    decrypted = pow(criptografado, d, N)
+    decrypted_bytes = decrypted.to_bytes(math.ceil(decrypted.bit_length() / 8), byteorder='big')
+    return decrypted_bytes.decode()
+
+def extended_euclidean_algorithm(a: int, b: int):
+        if a == 0:
+            return (b, 0, 1)
+        else:
+            gcd, x, y = extended_euclidean_algorithm(b % a, a)
+            return (gcd, y - (b // a) * x, x)
+
+def find_d(e: int, fiN):
+    gcd, x, y = extended_euclidean_algorithm(e, fiN)
+    if gcd != 1:
+        raise ValueError(f"{e} não tem inverso multiplicativo modulo {fiN}")
+    else:
+        return x % fiN
 
 
-if __name__ == '__main__':
+def get_rsa():
     while True:
-        print('Definindo p e q')
         p, q = get_two_prime_numbers()
         
-        print('Calculando N')
         N = p * q
 
-        print('Calculando Φ(N)')
         fiN = (p - 1) * (q - 1)
 
-        print('Calculando e')
         e = fiN - 1
 
-        print('Validando de Φ(N) e "e" são primos entre si')
-
         if coprime(fiN, e):
-            print('São primos entre si')
             break
-        
-        print('Não são primos entre si, tentando novamente')
-            
 
-    print('Calculando d')
-    d = 0
-    while  (e * d) % fiN != 1:
-        d += 1
+    d = find_d(e, fiN)
 
+    return e, d, N
+
+if __name__ == '__main__':
+    e, d, N = get_rsa()
     print('Criptografando')
     criptogrado = criptografar(frase, e, N)
     print('Decriptografando')
