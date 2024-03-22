@@ -1,7 +1,6 @@
 import json
 import math
-
-from flask import Flask, request
+import socket
 
 with open('private.json', 'r') as f:
     key = json.load(f)
@@ -20,22 +19,31 @@ def decriptografar(criptografado: int, d: int, N: int):
     decrypted_bytes = decrypted.to_bytes(math.ceil(decrypted.bit_length() / 8), byteorder='big')
     return decrypted_bytes.decode()
 
-
-app = Flask(__name__)
-
-
-@app.route('/get_key')
-def get_key():
-    return json.dumps(key)
-
-
-@app.route('/', methods=['POST'])
-def index():
-    received = int(request.data.decode('utf8'))
-    message = decriptografar(received, key['key'], key['n'])
-    response = message.upper()
-    crypted_response = criptografar(response, key['key'], key['n'])
-    return str(crypted_response)
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    server_address = ('', 5000)
+    server_socket.bind(server_address)
+    server_socket.listen(1)
+
+    while True:
+        print('Aguardando conexão...')
+        connection, client_address = server_socket.accept()
+
+        try:
+            print(f'Conexão estabelecida com {client_address}')
+            key_data = json.dumps(public)
+            connection.sendall(key_data.encode())
+
+            while True:
+                data = connection.recv(2 ** 20)
+                if data:
+                    received = int(data.decode('utf8'))
+                    message = decriptografar(received, key['key'], key['n'])
+                    response = message.upper()
+                    crypted_response = criptografar(response, key['key'], key['n'])
+                    connection.sendall(str(crypted_response).encode())
+                else:
+                    break
+        finally:
+            connection.close()

@@ -23,11 +23,11 @@ public class GeraChave {
 
         try {
             FileWriter privateFile = new FileWriter("private.json");
-            privateFile.write(String.format("{\n  \"key\": \"%s\",\n  \"n\": \"%s\"\n}", e.toString(), N.toString()));
+            privateFile.write(String.format("{\n  \"key\": %s,\n  \"n\": %s\n}", e.toString(), N.toString()));
             privateFile.close();
 
             FileWriter publicFile = new FileWriter("public.json");
-            publicFile.write(String.format("{\n  \"key\": \"%s\",\n  \"n\": \"%s\"\n}", d.toString(), N.toString()));
+            publicFile.write(String.format("{\n  \"key\": %s,\n  \"n\": %s\n}", d.toString(), N.toString()));
             publicFile.close();
         } catch (IOException ex) {
             System.out.println("Erro ao salvar arquivo: " + ex.getMessage());

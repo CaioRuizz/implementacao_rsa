@@ -1,6 +1,7 @@
 import json
 import random
 import math
+import datetime
 
 frase = 'The information security is of significant importance to ensure the privacy of communications.'
 
@@ -40,6 +41,7 @@ def get_two_prime_numbers() -> list[int]:
         
         number = random.getrandbits(4096)
         if is_prime(number) and number not in response:
+            print('numero primo encontrado')
             response.append(number)
 
 def MDC(a: int, b: int) -> int:
@@ -93,7 +95,10 @@ def get_rsa():
 
     return e, d, N
 
+
 if __name__ == '__main__':
+    print('iniciando')
+    start = datetime.datetime.now()
     e, d, N = get_rsa()
     print('Criptografando')
     criptogrado = criptografar(frase, e, N)
@@ -116,3 +121,5 @@ if __name__ == '__main__':
 
     print(f'{criptogrado=}')
     print(f'{decriptogrado=}')
+
+    print(datetime.datetime.now() - start)
